@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LYX - Lyric Archive</title>
+    <style>
+        /* Classic Aesthetic Color Palette & Typography */
+        :root {
+            --bg-color: #F4F1EA;
+            --surface-color: #FFFFFF;
+            --text-main: #2C2C2C;
+            --text-muted: #7A756D;
+            --accent-color: #6C5B7B; 
+            --border-color: #E2DDD3;
+            --font-serif: 'Georgia', 'Merriweather', serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --danger-color: #d9534f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.6;
+            position: relative; /* For Piyush watermark */
+        }
+
+        /* --- Creator Watermark --- */
+        .creator-mark {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-style: italic;
+            opacity: 0.8;
+            pointer-events: none; /* So it doesn't interfere with clicking */
+            letter-spacing: 1px;
+            z-index: 100;
+        }
+
+        /* --- Logo & Tagline --- */
+        .logo-container {
+            margin-bottom: 0.5rem;
+        }
+
+        #login-screen .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-style: italic;
+            color: var(--text-main);
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .logo-tagline {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+            font-family: var(--font-sans);
+        }
+
+        /* ----- LOGIN SCREEN ----- */
+        #login-screen {
+            background-color: var(--surface-color);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            margin-top: -1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus { border-color: var(--accent-color); }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--text-main);
+            color: var(--surface-color);
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: var(--font-sans);
+            letter-spacing: 1px;
+        }
+
+        button:hover { background-color: var(--accent-color); }
+
+        #login-error {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* ----- MAIN APP SCREEN ----- */
+        #app-screen {
+            display: none;
+            width: 100%;
+            max-width: 1300px;
+            height: 100vh;
+            padding: 2rem;
+            flex-direction: column;
+            padding-top: 3.5rem; /* Give space for Piyush watermark */
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1.5rem;
+            margin-left: 2rem;
+        }
+
+        .nav-tab {
+            background: none;
+            border: none;
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            padding: 0.5rem 0;
+            cursor: pointer;
+            width: auto;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: var(--text-main);
+            font-weight: bold;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+
+        .search-bar { position: relative; width: 250px; }
+        .search-bar input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+        }
+        .search-bar::before {
+            content: '🔍';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            opacity: 0.5;
+        }
+
+        .app-layout {
+            display: flex;
+            gap: 2rem;
+            height: calc(100% - 100px);
+        }
+
+        /* Editor Section */
+        .editor-section {
+            flex: 1;
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            min-width: 350px;
+        }
+
+        .editor-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .editor-row select, .editor-row input {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            outline: none;
+        }
+        
+        .editor-inputs input { font-size: 1.3rem; }
+        .editor-row select { color: var(--accent-color); cursor: pointer; }
+
+        textarea {
+            flex: 1;
+            width: 100%;
+            padding: 1rem 0;
+            border: none;
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--text-main);
+            outline: none;
+            resize: none;
+            line-height: 1.8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .action-btn { background-color: var(--accent-color); flex: 2; }
+        .secondary-btn {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            flex: 1;
+        }
+        .secondary-btn:hover { background-color: var(--border-color); }
+
+        /* Archive/Guide Display Section */
+        .display-section {
+            flex: 2;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .section-header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: auto;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: none; 
+        }
+        .back-btn:hover { background: var(--border-color); }
+
+        /* Grids */
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .cards-grid {
+            display: none; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Folder Card Design */
+        .folder-card {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .folder-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border-color: var(--accent-color);
+        }
+        .folder-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .folder-name { font-family: var(--font-serif); font-size: 1.1rem; font-weight: bold; }
+        .folder-count { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+        /* Lyric Card Design */
+        .lyric-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            position: relative; 
+        }
+        .lyric-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .card-title { font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 0.5rem; padding-right: 3rem; }
+        .card-date { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .card-preview { font-family: var(--font-serif); font-size: 0.9rem; color: var(--text-muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+
+        /* Action Buttons (Download & Delete) */
+        .card-actions { position: absolute; top: 1.2rem; right: 1rem; display: flex; gap: 0.5rem; }
+        .icon-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; width: auto; padding: 0; color: var(--text-muted); opacity: 0.5; transition: opacity 0.2s; }
+        .icon-btn:hover { opacity: 1; transform: scale(1.1); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        @media (max-width: 900px) {
+            .app-layout { flex-direction: column; height: auto; }
+            .editor-section { min-height: 400px; }
+            header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .nav-tabs { width: 100%; justify-content: flex-start; margin-left: 0;}
+            .search-bar { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PIYUSH LOGO (Always in top right) -->
+    <div class="creator-mark">Piyush</div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="logo-container">
+            <div class="logo">LYX <span class="logo-icon">✒️</span></div>
+            <div class="logo-tagline">My own Writing World</div>
+        </div>
+        <div class="login-subtitle">Admin Access Only</div>
+        
+        <div class="input-group">
+            <label for="adminId">Admin ID</label>
+            <input type="text" id="adminId" autocomplete="off" spellcheck="false">
+        </div>
+        
+        <div class="input-group">
+            <label for="adminPass">Password</label>
+            <input type="password" id="adminPass">
+        </div>
+        
+        <button onclick="attemptLogin()">Enter Studio</button>
+        <div id="login-error">Incorrect Admin ID or Password.</div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="app-screen">
+        <header>
+            <div class="logo-container">
+                <div class="logo">LYX <span class="logo-icon">✒️</span></div>
+                <div class="logo-tagline">My own Writing World</div>
+            </div>
+            
+            <div class="nav-tabs">
+                <button class="nav-tab active" id="tab-studio" onclick="switchTab('studio')">My Studio</button>
+                <button class="nav-tab" id="tab-guide" onclick="switchTab('guide')">Guide</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search lyrics..." onkeyup="searchLyrics()" spellcheck="false">
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <!-- Writing Area -->
+            <div class="editor-section">
+                <div class="editor-row">
+                    <select id="lyricSection">
+                        <option value="studio">Save to: My Studio</option>
+                        <option value="guide">Save to: Guide (Artists)</option>
+                    </select>
+                    <input type="text" id="lyricFolder" placeholder="Folder / Artist Name" spellcheck="false">
+                </div>
+                <div class="editor-row editor-inputs">
+                    <input type="text" id="lyricTitle" placeholder="Song Title..." spellcheck="false">
+                </div>
+                <textarea id="lyricContent" placeholder="Pour your thoughts here..." spellcheck="false"></textarea>
+                
+                <div class="button-group">
+                    <button class="action-btn" onclick="saveLyric()">Save Lyrics</button>
+                    <button class="secondary-btn" onclick="clearEditor()">New Lyric</button>
+                </div>
+            </div>
+
+            <!-- Display Area (Folders & Cards) -->
+            <div class="display-section">
+                <div class="section-header-area">
+                    <h2 class="section-title" id="displayTitle">My Folders</h2>
+                    <button class="back-btn" id="backBtn" onclick="showFolders()">⬅ Back to Folders</button>
+                </div>
+                
+                <div class="folders-grid" id="foldersContainer"></div>
+                <div class="cards-grid" id="cardsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Security ---
+        const ADMIN_ID = "Sunonthesea";
+        const ADMIN_PASS = "Purplecloud";
+
+        function attemptLogin() {
+            if (document.getElementById("adminId").value === ADMIN_ID && 
+                document.getElementById("adminPass").value === ADMIN_PASS) {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("app-screen").style.display = "flex";
+                document.body.style.display = "block"; 
+                document.body.style.justifyContent = "initial";
+                document.body.style.alignItems = "initial";
+                renderView(); // Start app
+            } else {
+                document.getElementById("login-error").style.display = "block";
+            }
+        }
+
+        document.getElementById("adminPass").addEventListener("keypress", e => { if(e.key === "Enter") attemptLogin(); });
+
+        // --- App State & Data ---
+        let lyricsDatabase = JSON.parse(localStorage.getItem('lyx_database')) || [];
+        let currentEditId = null; 
+        let activeTab = 'studio'; 
+        let viewingFolder = null; 
+
+        function getFormattedDate() {
+            const today = new Date();
+            let mm = today.getMonth() + 1;
+            let dd = today.getDate();
+            return today.getFullYear() + '-' + (mm < 10 ? '0'+mm : mm) + '-' + (dd < 10 ? '0'+dd : dd);
+        }
+
+        // --- Navigation Logic ---
+        function switchTab(tabName) {
+            activeTab = tabName;
+            document.getElementById('tab-studio').classList.remove('active');
+            document.getElementById('tab-guide').classList.remove('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('lyricSection').value = tabName;
+            viewingFolder = null;
+            renderView();
+        }
+
+        function showFolders() {
+            viewingFolder = null;
+            renderView();
+        }
+
+        // --- Core Rendering Engine ---
+        function renderView() {
+            const foldersContainer = document.getElementById('foldersContainer');
+            const cardsContainer = document.getElementById('cardsContainer');
+            const backBtn = document.getElementById('backBtn');
+            const displayTitle = document.getElementById('displayTitle');
+
+            const currentTabData = lyricsDatabase.filter(l => l.section === activeTab);
+
+            if (viewingFolder === null) {
+                foldersContainer.style.display = 'grid';
+                cardsContainer.style.display = 'none';
+                backBtn.style.display = 'none';
+                displayTitle.innerText = activeTab === 'studio' ? 'My Studio Folders' : 'Artist Guide Folders';
+                foldersContainer.innerHTML = '';
+
+                const folderCounts = {};
+                currentTabData.forEach(l => {
+                    folderCounts[l.folder] = (folderCounts[l.folder] || 0) + 1;
+                });
+
+                Object.keys(folderCounts).forEach(folderName => {
+                    const fCard = document.createElement('div');
+                    fCard.className = 'folder-card';
+                    fCard.onclick = () => { viewingFolder = folderName; renderView(); };
+                    
+                    fCard.innerHTML = `
+                        <div class="card-actions">
+                            <button class="icon-btn" title="Delete Folder" onclick="deleteFolder(event, '${folderName}')">🗑️</button>
+                        </div>
+                        <div class="folder-icon">📁</div>
+                        <div class="folder-name">${folderName}</div>
+                        <div class="folder-count">${folderCounts[folderName]} Lyrics</div>
+                    `;
+                    foldersContainer.appendChild(fCard);
+                });
+
+            } else {
+                foldersContainer.style.display = 'none';
+                cardsContainer.style.display = 'grid';
+                backBtn.style.display = 'block';
+                displayTitle.innerText = `📁 ${viewingFolder}`;
+                cardsContainer.innerHTML = '';
+                
+                const folderData = currentTabData.filter(l => l.folder === viewingFolder);
+                
+                folderData.forEach(lyric => {
+                    const card = document.createElement("div");
+                    card.className = "lyric-card";
+                    card.onclick = () => loadIntoEditor(lyric);
+                    
+                    card.innerHTML = `
+                        <div class="card-actions">
+                            <button class="icon-btn" title="Download" onclick="triggerDownload(event, ${lyric.id})">⬇️</button>
+                            <button class="icon-btn" title="Delete" onclick="deleteLyric(event, ${lyric.id})">🗑️</button>
+                        </div>
+                        <div class="card-title">${lyric.title}</div>
+                        <div class="card-date">${lyric.date}</div>
+                        <div class="card-preview">${lyric.content.replace(/\n/g, '<br>')}</div>
+                    `;
+                    cardsContainer.appendChild(card);
+                });
+            }
+        }
+
+        // --- Save / Edit / Delete ---
+        function saveLyric() {
+            const section = document.getElementById("lyricSection").value;
+            const folder = document.getElementById("lyricFolder").value.trim() || "Uncategorized";
+            const title = document.getElementById("lyricTitle").value.trim() || "Untitled";
+            const content = document.getElementById("lyricContent").value;
+            const date = getFormattedDate();
+
+            if (content.trim() === "") return alert("Please write some lyrics.");
+
+            if (currentEditId !== null) {
+                const index = lyricsDatabase.findIndex(l => l.id === currentEditId);
+                if (index !== -1) {
+                    lyricsDatabase[index] = { ...lyricsDatabase[index], section, folder, title, content, date };
+                }
+            } else {
+                lyricsDatabase.unshift({ id: Date.now(), section, folder, title, date, content });
+            }
+
+            localStorage.setItem('lyx_database', JSON.stringify(lyricsDatabase));
+            if(activeTab !== section) switchTab(section); 
+            renderView();
+            clearEditor();
+        }
+
+        function loadIntoEditor(lyric) {
+            document.getElementById("lyricSection").value = lyric.section;
+            document.getElementById("lyricFolder").value = lyric.folder;
+            document.getElementById("lyricTitle").value = lyric.title;
+            document.getElementById("lyricContent").value = lyric.content;
+            currentEditId = lyric.id; 
+        }
+
+        function clearEditor() {
+            document.getElementById("lyricFolder").value = "";
+            document.getElementById("lyricTitle").value = "";
+            document.getElementById("lyricContent").value = "";
+            document.getElementById("lyricSection").value = activeTab; 
+            currentEditId = null; 
+        }
+
+        function deleteFolder(event, folderName) {
+            event.stopPropagation(); 
+            if(confirm(`Delete the folder "${folderName}" and ALL lyrics inside it?`)) {
+                lyricsDatabase = lyricsDatabase.filter(l => !(l.folder === folderName && l.section === activeTab));
+                localStorage.setItem('lyx_database', JSON.stringify(lyricsDatabase));
+                renderView();
+            }
+        }
+
+        function deleteLyric(event, id) {
+            event.stopPropagation();
+            if(confirm("Delete this lyric?")) {
+                lyricsDatabase = lyricsDatabase.filter(l => l.id !== id);
+                localStorage.setItem('lyx_database', JSON.stringify(lyricsDatabase));
+                if (currentEditId === id) clearEditor();
+                
+                const remainingInFolder = lyricsDatabase.filter(l => l.folder === viewingFolder && l.section === activeTab);
+                if(remainingInFolder.length === 0) viewingFolder = null;
+                
+                renderView();
+            }
+        }
+
+        function triggerDownload(event, id) {
+            event.stopPropagation(); 
+            const l = lyricsDatabase.find(x => x.id === id);
+            if (l) {
+                const text = `Title: ${l.title}\nDate: ${l.date}\nFolder: ${l.folder}\n------------------\n\n${l.content}`;
+                const blob = new Blob([text], { type: "text/plain" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${l.title.replace(/\s+/g, '_')}.txt`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }
+        }
+
+        // --- Search ---
+        function searchLyrics() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            
+            if(query.trim() === "") {
+                renderView(); 
+                return;
+            }
+
+            document.getElementById('foldersContainer').style.display = 'none';
+            const cardsContainer = document.getElementById('cardsContainer');
+            cardsContainer.style.display = 'grid';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('displayTitle').innerText = 'Search Results';
+            cardsContainer.innerHTML = '';
+            
+            const results = lyricsDatabase.filter(l => 
+                l.section === activeTab && 
+                (l.title.toLowerCase().includes(query) || l.content.toLowerCase().includes(query) || l.folder.toLowerCase().includes(query))
+            );
+
+            results.forEach(lyric => {
+                const card = document.createElement("div");
+                card.className = "lyric-card";
+                card.onclick = () => loadIntoEditor(lyric);
+                card.innerHTML = `
+                    <div style="font-size:0.75rem; color:var(--accent-color); margin-bottom:0.5rem">📁 ${lyric.folder}</div>
+                    <div class="card-title">${lyric.title}</div>
+                    <div class="card-date">${lyric.date}</div>
+                    <div class="card-preview">${lyric.content.replace(/\n/g, '<br>')}</div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
